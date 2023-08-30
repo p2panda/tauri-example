@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Session, KeyPair, initWebAssembly } from 'shirokuma';
 
-import "./App.css";
-
 type Props = {
   children: React.ReactNode;
 };
@@ -13,6 +11,7 @@ export const InitWasm = ({ children }: Props) => {
   useEffect(() => {
     const init = async () => {
       await initWebAssembly();
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setReady(true);
     };
 
@@ -23,7 +22,7 @@ export const InitWasm = ({ children }: Props) => {
 };
 
 function App() {
-  const { keyPair, session } = useMemo(() => {
+  const { keyPair } = useMemo(() => {
     const keyPair = new KeyPair();
     const session = new Session('http://localhost:2020/graphql')
       .setKeyPair(keyPair);
