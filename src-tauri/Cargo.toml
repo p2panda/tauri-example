@@ -1,24 +1,18 @@
 [package]
 name = "tauri-example"
 version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+description = "A Tauri App with p2panda"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
 tauri-build = { version = "1.4", features = [] }
 
 [dependencies]
 aquadoggo = { git = "https://github.com/p2panda/aquadoggo", rev = "9c8c49e28d08b5dd9b76c9fa195e41b6fa042116" }
-tauri = { version = "1.4", features = ["shell-open"] }
+p2panda-rs = "0.7.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+tauri = { version = "1.4", features = ["shell-open"] }
 
 [features]
-# this feature is used for production builds or when `devPath` points to the filesystem
-# DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]

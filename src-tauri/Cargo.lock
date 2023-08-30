@@ -5626,6 +5626,7 @@ name = "tauri-example"
 version = "0.0.0"
 dependencies = [
  "aquadoggo",
+ "p2panda-rs",
  "serde",
  "serde_json",
  "tauri",
