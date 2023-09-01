@@ -137,8 +137,9 @@ checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
 
 [[package]]
 name = "aquadoggo"
-version = "0.4.0"
-source = "git+https://github.com/p2panda/aquadoggo?rev=9c8c49e28d08b5dd9b76c9fa195e41b6fa042116#9c8c49e28d08b5dd9b76c9fa195e41b6fa042116"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "60f5309fbe13cd7ef125e2a04d21b445207b82d5cf740ed2efdcc8b44d4f9917"
 dependencies = [
  "anyhow",
  "async-graphql",
