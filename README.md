@@ -17,6 +17,22 @@ npm install
 npm run tauri dev
 ```
 
+## Compile release binaries
+
+With the help of a github workflow task binaries for Windows, MacOS and Linux are compiled and
+pushed to a new release whenever a you push a new tag. For example:
+
+```bash
+# Create a new tag
+git tag v0.1.0
+
+# Push the current code and tags
+git push --tags
+```
+
+This will trigger the `ci` to compile binaries, create a new release (`v0.1.0`) and upload the
+binaries to the release assets.
+
 ## Next steps
 
 1. Use [`fishy`](https://github.com/p2panda/fishy) to design, manage and deploy schemas on your node
