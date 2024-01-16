@@ -1,5 +1,5 @@
 [package]
-name = "tauri-example"
+name = "p2panda-tauri-example"
 version = "0.0.0"
 description = "A Tauri App with p2panda"
 edition = "2021"

@@ -60,7 +60,7 @@ allow_schema_ids = [
 # your operation system and the given app name. As a result it should remain 
 # commented out in this file.   
 #
-# database_url = "sqlite:$HOME/.local/share/tauri-example/db.sqlite3"
+# database_url = "sqlite:$HOME/.local/share/p2panda-tauri-example/db.sqlite3"
 
 # Maximum number of connections that the database pool should maintain.
 #
@@ -107,7 +107,7 @@ quic_port = 2022
 # your operation system and the given app name. As a result it should remain 
 # commented out in this file.   
 #
-# blobs_base_path = "$HOME/.local/share/tauri-example/blobs"
+# blobs_base_path = "$HOME/.local/share/p2panda-tauri-example/blobs"
 
 # ﾟ･｡+☆+｡･
 # IDENTITY
@@ -128,7 +128,7 @@ quic_port = 2022
 # your operation system and the given app name. As a result it should remain 
 # commented out in this file.
 #
-# private_key = "$HOME/.local/share/tauri-example/private-key.txt"
+# private_key = "$HOME/.local/share/p2panda-tauri-example/private-key.txt"
 
 # ﾟ･｡+☆+｡･ﾟ･｡+☆+
 # LOCAL NETWORKS

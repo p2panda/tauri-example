@@ -3906,6 +3906,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "p2panda-tauri-example"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "aquadoggo",
+ "p2panda-rs",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "toml 0.8.8",
+]
+
+[[package]]
 name = "pango"
 version = "0.15.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5660,20 +5674,6 @@ dependencies = [
  "time",
  "uuid",
  "walkdir",
-]
-
-[[package]]
-name = "tauri-example"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "aquadoggo",
- "p2panda-rs",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "toml 0.8.8",
 ]
 
 [[package]]

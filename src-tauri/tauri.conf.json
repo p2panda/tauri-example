@@ -12,10 +12,6 @@
   "tauri": {
     "allowlist": {
       "all": false,
-      "fs": {
-        "all": true,
-        "scope": ["$APPDATA/tauri-example/*"]
-      },
       "shell": {
         "all": false,
         "open": true
@@ -24,7 +20,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "p2panda-tauri-example",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -43,7 +39,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "tauri-example",
+        "title": "p2panda-tauri-example",
         "width": 800,
         "height": 600
       }
