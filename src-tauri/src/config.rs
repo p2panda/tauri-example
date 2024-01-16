@@ -6,8 +6,10 @@ use anyhow::Result;
 use aquadoggo::{ConfigFile, Configuration};
 use tauri::AppHandle;
 
+/// Name of `aquadoggo` config toml file.
 const AQUADOGGO_CONFIG: &str = "config.toml";
 
+/// Name of directory where tauri resources are located.
 const RESOURCES_PATH: &str = "resources";
 
 /// Load and validate an `aquadoggo` node configuration from .toml file.

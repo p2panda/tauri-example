@@ -12,8 +12,10 @@ use tauri::{async_runtime, AppHandle};
 
 use crate::config::load_config;
 
+/// Directory where `aquadoggo` will store and serve blobs from. 
 const BLOBS_DIR: &str = "blobs";
 
+/// Temp folder where app data is persisted in dev mode.
 const TMP_APP_DATA_PATH: &str = "./tmp";
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
