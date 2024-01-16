@@ -1,11 +1,14 @@
-# tauri-example
+# p2panda-tauri-example
 
-This is a very basic example on how to integrate an [`aquadoggo`](https://github.com/p2panda/aquadoggo/) node right next to a React frontend using the desktop application framework [Tauri](https://tauri.app/). By embedding a node like that, your application will gain full peer-to-peer and local-first capabilities.
+This is a very basic example on how to integrate an
+[`aquadoggo`](https://github.com/p2panda/aquadoggo/) node right next to a React frontend using
+the desktop application framework [Tauri](https://tauri.app/). By embedding a node like that, your
+application will gain full peer-to-peer and local-first capabilities.
 
 ## Requirements
 
-* Rust
-* NodeJS
+- Rust
+- NodeJS
 
 ## Usage
 
@@ -16,6 +19,25 @@ npm install
 # Start Tauri development window
 npm run tauri dev
 ```
+
+## Storage
+
+Tauri chooses where app data is stored based on expected platform specific locations.
+
+Linux: Resolves to `$XDG_DATA_HOME` or `$HOME/.local/share`.
+macOS: Resolves to `$HOME/Library/Application Support`.
+Windows: Resolves to `{FOLDERID_LocalAppData}`.
+
+Data for both the WebView and the rust code is persisted to the sub-folder `p2panda-tauri-example`.
+
+## Configuration
+
+The embedded `aquadoggo` node can be configured via a `config.toml` file. On initial startup
+a default config is generated and stored in the app data directory.
+
+See config file comments for detailed instructions on the extensive configuration options. Visit  
+the [`aquadoggo` cli](https://github.com/p2panda/aquadoggo/tree/main/aquadoggo_cli) for further
+information and examples.
 
 ## Compile release binaries
 
@@ -32,6 +54,14 @@ git push --tags
 
 This will trigger the `ci` to compile binaries, create a new release (`v0.1.0`) and upload the
 binaries to the release assets.
+
+## Development
+
+### Application data
+
+In development mode (`npm run tauri dev`) application data is persisted to `src-tauri/tmp`. If
+you want to wipe all your app data and start fresh, you can delete this directory and all it's
+content.
 
 ## Next steps
 
