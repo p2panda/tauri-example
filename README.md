@@ -30,6 +30,12 @@ Windows: Resolves to `{FOLDERID_LocalAppData}`.
 
 Data for both the WebView and the rust code is persisted to the sub-folder `p2panda-tauri-example`.
 
+## Identity
+
+On first run a new ed25519 key pair is generated and saved to a file named `private-key.txt` in
+the app data directory. From this point on it is re-used each time you start the application, this
+is the identity of the embedded `aquadoggo` node (which is different from a client's identity).
+
 ## Configuration
 
 The embedded `aquadoggo` node can be configured via a `config.toml` file. On initial startup

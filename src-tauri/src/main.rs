@@ -2,15 +2,20 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod config;
+mod key_pair;
 
 use std::fs::{self, DirBuilder};
 use std::path::PathBuf;
 
 use aquadoggo::Node;
+use key_pair::generate_or_load_key_pair;
 use p2panda_rs::identity::KeyPair;
 use tauri::{async_runtime, AppHandle};
 
 use crate::config::load_config;
+
+/// Name of file where node's private key is stored.
+const PRIVATE_KEY_FILE: &str = "private-key.txt";
 
 /// Directory where `aquadoggo` will store and serve blobs from. 
 const BLOBS_DIR: &str = "blobs";
@@ -52,6 +57,13 @@ fn setup_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error +
     // Get the app data directory path.
     let app_data_dir = app_data_dir(&app_handle);
 
+    // Create a KeyPair or load it from private-key.txt file in app data directory.
+    //
+    // This key pair is used to identify the node on the network, it is not used for signing
+    // any application data.
+    let key_pair = generate_or_load_key_pair(app_data_dir.join(PRIVATE_KEY_FILE))
+        .expect("error generating or loading node key pair");
+
     // Load the config from app data directory. If this is the first time the app is
     // being run then the default aquadoggo config file is copied into place and used.
     let mut config = load_config(&app_handle, &app_data_dir)?;
@@ -73,7 +85,6 @@ fn setup_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error +
 
     // Spawn aquadoggo in own async task.
     async_runtime::spawn(async {
-        let key_pair = KeyPair::new();
         let node = Node::start(key_pair, config).await;
         node.on_exit().await;
         node.shutdown().await;
