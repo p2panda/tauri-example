@@ -1,0 +1,235 @@
+# Default aquadoggo configuration file used for https://github.com/p2panda/tauri-example.
+#
+# On first startup this file is copied into suitable location on filesystem according to 
+# the application data directory chosen by Tauri and the app name stated in your 
+# tauri.conf.json. 
+
+# ﾟ･｡+☆+｡
+# SCHEMAS
+# ﾟ･｡+☆+｡
+
+# List of schema ids which a node will replicate, persist and expose on the
+# GraphQL API.
+#
+# When allowing a schema you automatically opt into announcing, replicating and
+# materializing documents connected to it, supporting applications and networks
+# which are dependent on this data.
+#
+# It is recommended to set this list to all schema ids your own application
+# should support, including all important system schemas. For example:
+#
+allow_schema_ids = [
+    # To discover new schemas, set your node to replicate schema definition
+    # documents by including these two built-in schema ids. Your node will now
+    # search for and replicate schemas which have been published to the
+    # network.
+    "schema_definition_v1",
+    "schema_field_definition_v1",
+
+    # To replicate documents which represent blobs (binary files) include the
+    # following two built-in schema ids. This does not instruct your node to
+    # replicate any blobs it finds on the network, but only those which are
+    # dependencies of # other documents you already have.
+    #
+    # If you only want to replicate the meta data, not the binary content,
+    # then only include the `blob_v1`.
+    "blob_v1",
+    "blob_piece_v1",
+
+    # The schemas required by your application.
+    # "gardens_002048de60bb7ef5a1e88b7b7b32da976cef927d083afb4132cbe631beb47ccb293b",
+    # "tiles_0020c1b8203a112c4184bed03a8781fbfc9562bbc46cb92a88592b91e34648709c60",
+]
+#
+# WARNING: When set to wildcard "*", your node will support _any_ schemas it
+# will encounter on the network. This is useful for experimentation and local
+# development but _not_ recommended for production settings.
+#
+# allow_schema_ids = "*"
+
+# ﾟ･｡+☆+｡･
+# DATABASE
+# ﾟ･｡+☆+｡･
+
+# URL / connection string to PostgreSQL or SQLite database.
+#
+# When commented out it will default to an in-memory SQLite database URL.
+#
+# WARNING: This value is set on fist start-up of the tauri p2panda example 
+# application with a path based on the default app data location depending on 
+# your operation system and the given app name. As a result it should remain 
+# commented out in this file.   
+#
+# database_url = "sqlite:$HOME/.local/share/p2panda-tauri-example/db.sqlite3"
+
+# Maximum number of connections that the database pool should maintain.
+#
+# Be mindful of the connection limits for your database as well as other
+# applications which may want to connect to the same database (or even multiple
+# instances of the same application in high-availability deployments).
+#
+database_max_connections = 32
+
+# ﾟ･｡+☆
+# PORTS
+# ﾟ･｡+☆
+
+# HTTP port, serving the GraphQL API (for example hosted under
+# http://localhost:2020/graphql). This API is used for client-node
+# communication. Defaults to 2020.
+#
+# When port is taken the node will automatically pick a random, free port.
+#
+http_port = 2020
+
+# QUIC port for node-node communication and data replication. Defaults to 2022.
+#
+# When port is taken the node will automatically pick a random, free port.
+#
+quic_port = 2022
+
+# ﾟ･｡+☆
+# BLOBS
+# ﾟ･｡+☆
+
+# Path to folder where blobs (large binary files) are persisted. Defaults to a
+# temporary directory.
+#
+# WARNING: By default your node will not persist any blobs after shutdown. Set
+# a path for production settings to not loose data.
+#
+# WARNING: This setting should reflect the `database_url` configuration. If the
+# database is set to be stored somewhere permamently, you should do the same
+# for blob files to not run into data inconsistencies.
+#
+# WARNING: This value is set on fist start-up of the tauri p2panda example 
+# application with a path based on the default app data location depending on 
+# your operation system and the given app name. As a result it should remain 
+# commented out in this file.   
+#
+# blobs_base_path = "$HOME/.local/share/p2panda-tauri-example/blobs"
+
+# ﾟ･｡+☆+｡･
+# IDENTITY
+# ﾟ･｡+☆+｡･
+
+# Path to persist your ed25519 private key file. The key is used to identify
+# you towards other nodes during network discovery and replication. This key is
+# _not_ used to create and sign data.
+#
+# If a path is set, a key will be generated newly and stored under this path
+# when node starts for the first time.
+#
+# When comment out or no path is set, your node will generate an ephemeral
+# private key on every start up and _not_ persist it.
+#
+# WARNING: This value is set on fist start-up of the tauri p2panda example 
+# application with a path based on the default app data location depending on 
+# your operation system and the given app name. As a result it should remain 
+# commented out in this file.
+#
+# private_key = "$HOME/.local/share/p2panda-tauri-example/private-key.txt"
+
+# ﾟ･｡+☆+｡･ﾟ･｡+☆+
+# LOCAL NETWORKS
+# ﾟ･｡+☆+｡･ﾟ･｡+☆+
+
+# mDNS to discover other peers on the local network. Enabled by default.
+#
+mdns = true
+
+# ﾟ･｡+☆
+# NODES
+# ﾟ･｡+☆
+
+# List of known node addresses (IP + port) we want to connect to directly.
+#
+# NOTE: Make sure that nodes mentioned in this list are directly reachable
+# (they need to be hosted with a static IP Address). If you need to connect to
+# nodes with changing, dynamic IP addresses or even with nodes behind a
+# firewall or NAT, do not use this field but use at least one relay.
+#
+direct_node_addresses = [
+    # "192.0.2.0:2022",
+    # "192.0.2.2:3000",
+]
+
+# List of peers which are allowed to connect to your node.
+#
+# If set then only nodes (identified by their peer id) contained in this list
+# will be able to connect to your node (via a relay or directly). When not set
+# any other node can connect to yours.
+#
+# Peer IDs identify nodes by using their hashed public keys. They do _not_
+# represent authored data from clients and are only used to authenticate nodes
+# towards each other during networking.
+#
+# Use this list for example for setups where the identifier of the nodes you
+# want to form a network with is known but you still need to use relays as
+# their IP addresses change dynamically.
+#
+allow_peer_ids = "*"
+
+# List of peers which will be blocked from connecting to your node.
+#
+# If set then any peers (identified by their peer id) contained in this list
+# will be blocked from connecting to your node (via a relay or directly). When
+# an empty list is provided then there are no restrictions on which nodes can
+# connect to yours.
+#
+# Block lists and allow lists are exclusive, which means that you should
+# _either_ use a block list _or_ an allow list depending on your setup.
+#
+# Use this list for example if you want to allow _any_ node to connect to yours
+# _except_ of a known number of excluded nodes.
+#
+block_peer_ids = []
+
+# ﾟ･｡+☆+
+# RELAYS
+# ﾟ･｡+☆+
+
+# List of relay addresses.
+#
+# A relay helps discover other nodes on the internet (also known as
+# "rendesvouz" or "bootstrap" server) and helps establishing direct p2p
+# connections when node is behind a firewall or NAT (also known as
+# "holepunching").
+#
+# When a direct connection is not possible the relay will help to redirect the
+# (encrypted) traffic as an intermediary between us and other nodes. The node
+# will contact the relay and register your IP address for other peers.
+#
+# WARNING: This will potentially expose your IP address on the network. Do only
+# connect to trusted relays or make sure your IP address is hidden via a VPN or
+# proxy if you're concerned about leaking your IP.
+#
+# WARNING: Using a relay will potentially connect you to untrusted / unknown
+# nodes with which you will then exchange data with. If in doubt, use the list
+# of known node addresses instead and only connect to trusted nodes.
+#
+relay_addresses = [
+    # "192.0.2.16:2022",
+    # "192.0.2.17:2022",
+]
+
+# Set to true if node should also function as a relay. Defaults to false.
+#
+# Other nodes can use relays to aid discovery and establishing connectivity.
+#
+# NOTE: Relays _need_ to be hosted in a way where they can be reached directly,
+# for example with a static IP address through an VPS.
+#
+relay_mode = false
+
+# ﾟ･｡+☆+｡･
+# WORKERS
+# ﾟ･｡+☆+｡･
+
+# Number of concurrent workers which defines the maximum of materialization
+# tasks which can be worked on simultaneously.
+#
+# Use a higher number if you run your node on a powerful machine with many CPU
+# cores. Lower number for low-energy devices with limited resources.
+#
+worker_pool_size = 16
