@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::{fs, path::PathBuf};
+use std::{fs, path::{PathBuf, Path}};
 
 use anyhow::Result;
 use aquadoggo::{ConfigFile, Configuration};
@@ -13,8 +13,8 @@ const AQUADOGGO_CONFIG: &str = "config.toml";
 const RESOURCES_PATH: &str = "resources";
 
 /// Load and validate an `aquadoggo` node configuration from .toml file.
-fn load_config_file(config_path: &PathBuf) -> Result<Configuration> {
-    let config_str = fs::read_to_string(&config_path)?;
+fn load_config_file(config_path: &Path) -> Result<Configuration> {
+    let config_str = fs::read_to_string(config_path)?;
     let node_config: ConfigFile = toml::from_str(&config_str)?;
     node_config.try_into()
 }
@@ -23,7 +23,7 @@ fn load_config_file(config_path: &PathBuf) -> Result<Configuration> {
 /// default config.toml into the passed path and load it.
 pub fn load_config(
     app: &AppHandle,
-    app_data_path: &PathBuf,
+    app_data_path: &Path,
 ) -> Result<Configuration, anyhow::Error> {
     // This is the path where we expect our config file to be.
     let config_path = app_data_path.join(AQUADOGGO_CONFIG);

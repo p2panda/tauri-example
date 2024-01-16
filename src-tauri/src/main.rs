@@ -9,7 +9,6 @@ use std::path::PathBuf;
 
 use aquadoggo::Node;
 use key_pair::generate_or_load_key_pair;
-use p2panda_rs::identity::KeyPair;
 use tauri::{async_runtime, AppHandle};
 
 use crate::config::load_config;
@@ -17,7 +16,7 @@ use crate::config::load_config;
 /// Name of file where node's private key is stored.
 const PRIVATE_KEY_FILE: &str = "private-key.txt";
 
-/// Directory where `aquadoggo` will store and serve blobs from. 
+/// Directory where `aquadoggo` will store and serve blobs from.
 const BLOBS_DIR: &str = "blobs";
 
 /// Temp folder where app data is persisted in dev mode.
