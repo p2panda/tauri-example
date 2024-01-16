@@ -8,11 +8,13 @@ edition = "2021"
 tauri-build = { version = "1.4", features = [] }
 
 [dependencies]
+anyhow = "1.0.79"
 aquadoggo = { git = "https://github.com/p2panda/aquadoggo", rev = "82e85f0e3f1c7d3a6201b49cf3a3f89e6b2fcae3" }
 p2panda-rs = "0.8.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tauri = { version = "1.4", features = [ "fs-all", "shell-open"] }
+toml = "0.8.8"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
