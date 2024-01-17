@@ -15,7 +15,6 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.4.0",
-    "typescript": "^5.0.2",
     "vite": "^4.4.4"
   }
 }

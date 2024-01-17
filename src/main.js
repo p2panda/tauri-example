@@ -1,4 +1,4 @@
-import { KeyPair } from "shirokuma";
+import { KeyPair, Session } from "shirokuma";
 
 export const main = () => {
 	const keyPair = new KeyPair();
