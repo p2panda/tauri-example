@@ -24,9 +24,9 @@ npm run tauri dev
 
 Tauri chooses where app data is stored based on expected platform specific locations.
 
-Linux: Resolves to `$XDG_DATA_HOME` or `$HOME/.local/share`.
-macOS: Resolves to `$HOME/Library/Application Support`.
-Windows: Resolves to `{FOLDERID_LocalAppData}`.
+Linux: Resolves to `$XDG_DATA_HOME` or `$HOME/.local/share`.  
+macOS: Resolves to `$HOME/Library/Application Support`.  
+Windows: Resolves to `{FOLDERID_LocalAppData}`.  
 
 Data for both the WebView and the rust code is persisted to the sub-folder `p2panda-tauri-example`.
 
