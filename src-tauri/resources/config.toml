@@ -37,8 +37,7 @@ allow_schema_ids = [
     "blob_piece_v1",
 
     # The schemas required by your application.
-    # "gardens_002048de60bb7ef5a1e88b7b7b32da976cef927d083afb4132cbe631beb47ccb293b",
-    # "tiles_0020c1b8203a112c4184bed03a8781fbfc9562bbc46cb92a88592b91e34648709c60",
+    "sprites_002018fe0cfc15886613877cee8af96c4cadb6efa61dfe254c8d5a8ad2df41b8fe83",
 ]
 #
 # WARNING: When set to wildcard "*", your node will support _any_ schemas it
