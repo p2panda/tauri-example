@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::{fs, path::{PathBuf, Path}};
+use std::fs;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use aquadoggo::{ConfigFile, Configuration};
 use tauri::AppHandle;
 
-/// Name of `aquadoggo` config toml file.
-const AQUADOGGO_CONFIG: &str = "config.toml";
-
-/// Name of directory where tauri resources are located.
-const RESOURCES_PATH: &str = "resources";
+use crate::consts::{AQUADOGGO_CONFIG, BLOBS_DIR, RESOURCES_DIR};
 
 /// Load and validate an `aquadoggo` node configuration from .toml file.
 fn load_config_file(config_path: &Path) -> Result<Configuration> {
@@ -19,12 +16,9 @@ fn load_config_file(config_path: &Path) -> Result<Configuration> {
     node_config.try_into()
 }
 
-/// Load config file from app data directory if it exists, is not copy
+/// Load config file from app data directory if it exists, if not copy
 /// default config.toml into the passed path and load it.
-pub fn load_config(
-    app: &AppHandle,
-    app_data_path: &Path,
-) -> Result<Configuration, anyhow::Error> {
+pub fn load_config(app: &AppHandle, app_data_path: &Path) -> Result<Configuration, anyhow::Error> {
     // This is the path where we expect our config file to be.
     let config_path = app_data_path.join(AQUADOGGO_CONFIG);
 
@@ -33,12 +27,23 @@ pub fn load_config(
     if fs::read(&config_path).is_err() {
         let default_config_path = app
             .path_resolver()
-            .resolve_resource(PathBuf::new().join(RESOURCES_PATH).join(AQUADOGGO_CONFIG))
+            .resolve_resource(PathBuf::new().join(RESOURCES_DIR).join(AQUADOGGO_CONFIG))
             .expect("failed to resolve resource");
 
         fs::copy(default_config_path, &config_path)?;
     }
 
     // Now we can load the config file.
-    load_config_file(&config_path)
+    let mut config = load_config_file(&config_path)?;
+
+    // Override database url based on app data directory path.
+    config.database_url = format!(
+        "sqlite:{}/db.sqlite3",
+        app_data_path.to_str().expect("invalid character in path")
+    );
+
+    // Override blobs path based on app data directory path.
+    config.blobs_base_path = app_data_path.join(BLOBS_DIR);
+
+    Ok(config)
 }
