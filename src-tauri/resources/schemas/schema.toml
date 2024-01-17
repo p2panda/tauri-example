@@ -1,7 +1,7 @@
-[sprite]
+[sprites]
 description = "A sprite which can be placed on a 2 dimensional plane"
 
-[sprite.fields]
+[sprites.fields]
 img = { type = "relation", schema = { id = "blob_v1" } }
 pos_x = { type = "int" }
 pos_y = { type = "int" }
