@@ -69,6 +69,18 @@ In development mode (`npm run tauri dev`) application data is persisted to `src-
 you want to wipe all your app data and start fresh, you can delete this directory and all it's
 content.
 
+### Logging
+
+You can enable and configure logging using the `RUST_LOG` environment variable like so:
+
+```bash
+# Show debug logs emitted by `aquadoggo`
+RUST_LOG="debug" npm run tauri dev
+
+# Show info logs emitted by all crates used in `aquadoggo`
+RUST_LOG="info" npm run tauri dev
+```
+
 ## Next steps
 
 1. Use [`fishy`](https://github.com/p2panda/fishy) to design, manage and deploy schemas on your node

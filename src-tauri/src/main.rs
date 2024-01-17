@@ -93,6 +93,11 @@ fn setup_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error +
 }
 
 fn main() {
+    // Enable logging if set via `RUST_LOG` environment variable.
+    if std::env::var("RUST_LOG").is_ok() {
+        let _ = env_logger::builder().try_init();
+    }
+
     tauri::Builder::default()
         .setup(setup_handler)
         .invoke_handler(tauri::generate_handler![greet])
