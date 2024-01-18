@@ -18,32 +18,39 @@ fn load_config_file(config_path: &Path) -> Result<Configuration> {
 
 /// Load config file from app data directory if it exists, if not copy
 /// default config.toml into the passed path and load it.
-pub fn load_config(app: &AppHandle, app_data_path: &Path) -> Result<Configuration, anyhow::Error> {
-    // This is the path where we expect our config file to be.
-    let config_path = app_data_path.join(AQUADOGGO_CONFIG);
+pub fn load_config(
+    app: &AppHandle,
+    app_data_path: Option<&PathBuf>,
+) -> Result<Configuration, anyhow::Error> {
+    let default_config_path = app
+        .path_resolver()
+        .resolve_resource(PathBuf::new().join(RESOURCES_DIR).join(AQUADOGGO_CONFIG))
+        .expect("failed to resolve resource");
 
-    // Check if the expected config file exists. If not, this is the first time
-    // running the app and we want to copy the default into place.
-    if fs::read(&config_path).is_err() {
-        let default_config_path = app
-            .path_resolver()
-            .resolve_resource(PathBuf::new().join(RESOURCES_DIR).join(AQUADOGGO_CONFIG))
-            .expect("failed to resolve resource");
+    if let Some(path) = app_data_path {
+        // This is the path where we expect our config file to be.
+        let config_path = path.join(AQUADOGGO_CONFIG);
 
-        fs::copy(default_config_path, &config_path)?;
+        // Check if the expected config file exists. If not, this is the first time
+        // running the app and we want to copy the default into place.
+        if fs::read(&config_path).is_err() {
+            fs::copy(default_config_path, &config_path)?;
+        }
+
+        // Now we can load the config file.
+        let mut config = load_config_file(&config_path)?;
+
+        // Override database url based on app data directory path.
+        config.database_url = format!(
+            "sqlite:{}/db.sqlite3",
+            path.to_str().expect("invalid character in path")
+        );
+
+        // Override blobs path based on app data directory path.
+        config.blobs_base_path = path.join(BLOBS_DIR);
+
+        Ok(config)
+    } else {
+        load_config_file(&default_config_path)
     }
-
-    // Now we can load the config file.
-    let mut config = load_config_file(&config_path)?;
-
-    // Override database url based on app data directory path.
-    config.database_url = format!(
-        "sqlite:{}/db.sqlite3",
-        app_data_path.to_str().expect("invalid character in path")
-    );
-
-    // Override blobs path based on app data directory path.
-    config.blobs_base_path = app_data_path.join(BLOBS_DIR);
-
-    Ok(config)
 }

@@ -9,15 +9,22 @@ use std::path::PathBuf;
 use anyhow::Result;
 use p2panda_rs::identity::KeyPair;
 
+use crate::consts::PRIVATE_KEY_FILE;
+
 /// Returns a new instance of `KeyPair` by either loading the private key from a path or generating
 /// a new one and saving it in the file system.
-pub fn generate_or_load_key_pair(path: PathBuf) -> Result<KeyPair> {
-    let key_pair = if path.is_file() {
-        load_key_pair_from_file(path)?
+pub fn generate_or_load_key_pair(path: Option<&PathBuf>) -> Result<KeyPair> {
+    let key_pair = if let Some(path) = path {
+        let private_key_path = path.join(PRIVATE_KEY_FILE);
+        if private_key_path.is_file() {
+            load_key_pair_from_file(private_key_path.clone())?
+        } else {
+            let key_pair = KeyPair::new();
+            save_key_pair_to_file(&key_pair, private_key_path.clone())?;
+            key_pair
+        }
     } else {
-        let key_pair = KeyPair::new();
-        save_key_pair_to_file(&key_pair, path)?;
-        key_pair
+        KeyPair::new()
     };
 
     Ok(key_pair)

@@ -8,16 +8,15 @@ mod consts;
 mod key_pair;
 mod schema;
 
-use std::fs::{self, DirBuilder};
+use std::fs::DirBuilder;
 use std::path::PathBuf;
 use std::time::Duration;
 
 use aquadoggo::Node;
-use consts::{BLOBS_DIR, PRIVATE_KEY_FILE};
+use consts::BLOBS_DIR;
 use tauri::{async_runtime, AppHandle};
 
 use crate::config::load_config;
-use crate::consts::TMP_APP_DATA_DIR;
 use crate::key_pair::generate_or_load_key_pair;
 use crate::schema::load_schema_lock;
 
@@ -32,48 +31,43 @@ fn greet(name: &str) -> String {
 /// If in dev mode app data is persisted to a temporary folder "./tmp" in the project
 /// directory. When not in dev mode app data path is based on tauri defaults and app
 /// name defined in our tauri.conf.json file.
-fn app_data_dir(app: &AppHandle) -> Result<PathBuf, anyhow::Error> {
-    let app_data_path = if cfg!(dev) {
-        let tmp_data_dir = PathBuf::from(TMP_APP_DATA_DIR);
-        if fs::read_dir(&tmp_data_dir).is_err() {
-            DirBuilder::new().create(&tmp_data_dir)?;
-        }
-        tmp_data_dir
+fn app_data_dir(app: &AppHandle) -> Result<Option<PathBuf>, anyhow::Error> {
+    if cfg!(dev) {
+        Ok(None)
     } else {
         let path = app
             .path_resolver()
             .app_data_dir()
             .expect("error resolving app data dir");
-        path
-    };
 
-    // And create blobs directory incase it doesn't exist.
-    DirBuilder::new()
-        .recursive(true)
-        .create(app_data_path.join(BLOBS_DIR))?;
+        // Create blobs directory incase it doesn't exist.
+        DirBuilder::new()
+            .recursive(true)
+            .create(path.join(BLOBS_DIR))?;
 
-    Ok(app_data_path)
+        Ok(Some(path))
+    }
 }
 
 /// Launch node with configuration of persistent storage for SQLite database and blobs.
 fn setup_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error + 'static>> {
-    let app_handle = app.handle();
+    let app = app.handle();
 
     // Get the app data directory path.
-    let app_data_dir = app_data_dir(&app_handle)?;
+    let app_data_dir = app_data_dir(&app)?;
 
     // Create a KeyPair or load it from private-key.txt file in app data directory.
     //
     // This key pair is used to identify the node on the network, it is not used for signing
     // any application data.
-    let key_pair = generate_or_load_key_pair(app_data_dir.join(PRIVATE_KEY_FILE))?;
+    let key_pair = generate_or_load_key_pair(app_data_dir.as_ref())?;
 
     // Load the config from app data directory. If this is the first time the app is
     // being run then the default aquadoggo config file is copied into place and used.
-    let config = load_config(&app_handle, &app_data_dir)?;
+    let config = load_config(&app, app_data_dir.as_ref())?;
 
     // Load the schema.lock file.
-    let schema_lock = load_schema_lock(&app_handle)?;
+    let schema_lock = load_schema_lock(&app)?;
 
     // Channel for signaling that the node is started.
     let (tx, rx) = tokio::sync::oneshot::channel();

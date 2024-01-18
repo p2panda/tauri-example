@@ -3,9 +3,6 @@
 /// Name of file where node's private key is stored.
 pub(crate) const PRIVATE_KEY_FILE: &str = "private-key.txt";
 
-/// Temp folder where app data is persisted in dev mode.
-pub(crate) const TMP_APP_DATA_DIR: &str = "./tmp";
-
 /// Name of `aquadoggo` config toml file.
 pub(crate) const AQUADOGGO_CONFIG: &str = "config.toml";
 
