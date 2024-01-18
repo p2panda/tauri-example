@@ -13,6 +13,7 @@ const LOCAL_STORAGE_KEY = "privateKey";
 /// Address of local node.
 const NODE_ADDRESS = `http://localhost:2020/`;
 
+/// Path to the blobs HTTP endpoint.
 const BLOBS_PATH = `${NODE_ADDRESS}blobs/`;
 
 /// GraphQL endpoint.
@@ -103,8 +104,7 @@ export const main = async () => {
 
 	// Open a long running connection to a p2panda node and configure it so all
 	// calls in this session are executed using that key pair
-	const session = new Session(GRAPHQL_ENDPOINT).setKeyPair(keyPair);
-	window.session = session;
+	window.session = new Session(GRAPHQL_ENDPOINT).setKeyPair(keyPair);
 
 	// Set an interval timer to draw any new sprites every 2 seconds.
 	setInterval(async () => {
@@ -114,8 +114,12 @@ export const main = async () => {
 	// Get a sprite image we will use when creating sprites.
 	const [blobId, spriteImageId] = await getSpriteImage();
 
-	// Set onclick handler on body which creates and draws a new sprite.
 	const body = document.querySelector("body");
+
+	// Set the cursor style to be a cute sprite image.
+	body.style.cursor = `url("${BLOBS_PATH}${blobId}"), pointer`
+
+	// Set onclick handler on body which creates and draws a new sprite.
 	body.onclick = async (e) => {
 		const spriteId = await createSprite(e.x, e.y, spriteImageId);
 		drawSprite(spriteId, blobId, e.x, e.y);
