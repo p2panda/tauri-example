@@ -14,6 +14,7 @@ use std::time::Duration;
 
 use aquadoggo::Node;
 use consts::BLOBS_DIR;
+use tauri::{async_runtime, AppHandle, Manager, State};
 use tempdir::TempDir;
 
 use crate::config::load_config;
@@ -54,19 +55,25 @@ fn app_data_dir(app: &AppHandle) -> Result<PathBuf, anyhow::Error> {
 
 /// Launch node with configuration of persistent storage for SQLite database and blobs.
 fn setup_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error + 'static>> {
+    // Get a handle on the running application which gives us access to global state.
     let app = app.handle();
 
-    // Get the app data directory path.
+    // Get the app data directory path, in dev mode this will be an ephemeral tmp directory
+    // created for this instance of the app.
     let app_data_dir = app_data_dir(&app)?;
 
     // Create a KeyPair or load it from private-key.txt file in app data directory.
     //
     // This key pair is used to identify the node on the network, it is not used for signing
     // any application data.
-    let key_pair = generate_or_load_key_pair(app_data_dir.as_ref())?;
+    let key_pair = generate_or_load_key_pair(app_data_dir.clone())?;
 
     // Load the config from app data directory. If this is the first time the app is
     // being run then the default aquadoggo config file is copied into place and used.
+    //
+    // Environment variables are also parsed and will take priority over values in the config
+    // file.
+    let config = load_config(&app, app_data_dir.clone())?;
 
     // Add the configured nodes http port to the app state so we can access it from the frontend.
     app.manage(HttpPort(config.http_port));
@@ -80,7 +87,7 @@ fn setup_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error +
         .title("p2panda-tauri-example")
         .build()?;
 
-    // Load the schema.lock file.
+    // Load the schema.lock file containing our app schema which will be published to the node.
     let schema_lock = load_schema_lock(&app)?;
 
     // Channel for signaling that the node is started.
@@ -91,17 +98,19 @@ fn setup_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error +
         // Start the node.
         let node = Node::start(key_pair, config).await;
 
-        // Migrate the app schemas
+        // Migrate the app schemas.
         let did_migrate_schemas = node
             .migrate(schema_lock)
             .await
             .expect("failed to migrate app schema");
+
         if did_migrate_schemas {
             println!("Schema migration: app schemas successfully deployed on initial start-up");
-            // Sleep for a second to let the schemas and GraphQL API be built
+            // Sleep for a second to let the schemas and GraphQL API be built.
             tokio::time::sleep(Duration::from_secs(1)).await;
         }
 
+        // Signal that the node has started so that tauri will progress to launch the app.
         let _ = tx.send(());
 
         node.on_exit().await;
