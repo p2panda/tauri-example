@@ -1,9 +1,17 @@
 # p2panda-tauri-example
 
-This is a very basic example on how to integrate an
-[`aquadoggo`](https://github.com/p2panda/aquadoggo/) node right next to a React frontend using
-the desktop application framework [Tauri](https://tauri.app/). By embedding a node like that, your
-application will gain full peer-to-peer and local-first capabilities.
+<div align="center">
+  <img src="https://raw.githubusercontent.com/p2panda/.github/main/assets/tauri-example-screenshot.png" width="600" />
+</div>
+
+This is an example on how to integrate an [`aquadoggo`](https://github.com/p2panda/aquadoggo/)
+node right next to a React frontend using the desktop application framework
+[Tauri](https://tauri.app/). By embedding a node like that, your application will gain full
+peer-to-peer and local-first capabilities.
+
+On the front-end there is a simple JavaScript web app which demonstrates how to interact with the
+embedded node using `shirokuma` to publish documents, `GraphQL` for queries, and `http`
+endpoint for requesting blobs.
 
 ## Requirements
 
@@ -26,7 +34,7 @@ Tauri chooses where app data is stored based on expected platform specific locat
 
 Linux: Resolves to `$XDG_DATA_HOME` or `$HOME/.local/share`.  
 macOS: Resolves to `$HOME/Library/Application Support`.  
-Windows: Resolves to `{FOLDERID_LocalAppData}`.  
+Windows: Resolves to `{FOLDERID_LocalAppData}`.
 
 Data for both the WebView and the rust code is persisted to the sub-folder `p2panda-tauri-example`.
 
@@ -65,9 +73,13 @@ binaries to the release assets.
 
 ### Application data
 
-In development mode (`npm run tauri dev`) application data is persisted to `src-tauri/tmp`. If
-you want to wipe all your app data and start fresh, you can delete this directory and all it's
-content.
+In development mode (`npm run tauri dev`) data for each app instance is not persisted.
+
+### Schema
+
+Schema are deployed to the node automatically on initial startup from a `schema.lock` file located
+in the tauri `resources/schemas` directory. This file was created with the CLI tool
+[`fishy`](https://github.com/p2panda/fishy).
 
 ### Logging
 
@@ -79,6 +91,22 @@ RUST_LOG="debug" npm run tauri dev
 
 # Show info logs emitted by all crates used in `aquadoggo`
 RUST_LOG="info" npm run tauri dev
+```
+
+### Multiple instances
+
+To test out p2p discovery and replication locally you can run multiple instances of the app
+simultaneously. You do this like so:
+
+```bash
+# Start up the front-end dev server, this same endpoint is shared across app instances.
+npm run dev
+
+# Start the tauri app selecting random port http port for the node. Run this many times to launch more peers.
+npm run peer
+
+# You can choose the http port manually too
+HTTP_PORT=1234 npm run peer
 ```
 
 ## Next steps
