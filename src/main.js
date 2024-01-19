@@ -1,4 +1,3 @@
-import { invoke } from "@tauri-apps/api/tauri";
 import { KeyPair, Session } from "shirokuma";
 import {
 	createSprite,
@@ -6,19 +5,11 @@ import {
 	getSprites,
 	getSpriteImages,
 } from "./queries";
-
+import { intoColour, drawSprite } from "./ui";
 import pandaUrl from "./panda.gif";
 
 /// Local storage key for our private key.
 const LOCAL_STORAGE_KEY = "privateKey";
-
-/// Generate a colour from a public key string.
-function intoColour(publicKeyString) {
-	let stringUniqueHash = [...publicKeyString].reduce((acc, char) => {
-		return char.charCodeAt(0) + ((acc << 5) - acc);
-	}, 0);
-	return `hsl(${stringUniqueHash % 360}, 95%, 50%)`;
-}
 
 /// Generate a new KeyPair or retrieve existing one from local storage.
 const getKeyPair = () => {
@@ -33,23 +24,43 @@ const getKeyPair = () => {
 };
 
 /// Get the latest sprite image, or upload our own if none are found.
-const getSpriteImage = async () => {
-	const latestSpriteImages = await getSpriteImages(1);
+const getLatestSpriteImage = async () => {
+	// Check the cache first!
+	if (window.LATEST_SPRITE) {
+		return window.LATEST_SPRITE;
+	}
+
+	// Query the node for a collection of max 1 sprite image.
+	let latestSpriteImages = await getSpriteImages(1);
+
+	// If the totalCount is zero then nobody published any sprite images yet and we should do it.
 	if (latestSpriteImages.totalCount === 0) {
 		console.log("No sprite images found, uploading 'panda.gif'");
+
+		// Fetch a cute panda gif.
 		const data = await fetch(pandaUrl);
 		const blob = await data.blob();
+
+		// Publish it to the node as a blob_v1 document.
 		const blobId = await window.session.createBlob(blob);
-		const spriteImageId = await createSpriteImage(
+
+		// Now create the sprite image document using the blob id we got in the previous step. We add a
+		// description which can be used in the image element's alt text later.
+		await createSpriteImage(
 			blobId,
 			"A cute cartoon panda standing on it's back legs lifting it's arms up and down"
 		);
-		return [blobId, spriteImageId];
-	} else {
-		const latestSpriteImage = latestSpriteImages.documents[0];
-		const { fields, meta } = latestSpriteImage;
-		return [fields.blob.meta.documentId, meta.documentId];
 	}
+
+	// It might take a few milliseconds for the document to be ready.
+	while (latestSpriteImages.totalCount === 0) {
+		latestSpriteImages = await getSpriteImages(1);
+	}
+
+	// Set the cache and return the sprite image document.
+	const latestSpriteImage = latestSpriteImages.documents[0];
+	window.LATEST_SPRITE = latestSpriteImage;
+	return latestSpriteImage;
 };
 
 /// Request any new sprites from the node and append them to the document body.
@@ -87,79 +98,56 @@ const drawSprites = async () => {
 	}
 };
 
-/// Convert a sprite into an img element and append it to the document body.
-const drawSprite = (
-	spriteId,
-	blobId,
-	posX,
-	posY,
-	hexColour,
-	timestamp,
-	description
-) => {
-	const body = document.querySelector("body");
-	const img = document.createElement("img");
-	img.src = `${BLOBS_PATH}${blobId}`;
-	img.style.left = `${posX}px`;
-	img.style.top = `${posY}px`;
-	img.style.zIndex = timestamp;
-	img.style.backgroundColor = hexColour;
-	img.classList.add("sprite");
-	img.alt = description;
-	img.id = spriteId;
-	body.appendChild(img);
+/// Create, publish and draw a sprite every time the mouse is clicked, yeh!
+const onClickCreateSprite = async (e) => {
+	const spriteImage = await getLatestSpriteImage();
+	// Derive a unique deterministic colour from our public key.
+	const colour = intoColour(getKeyPair().publicKey());
+	// Get a unix timestamp for now.
+	const timestamp = Math.floor(new Date().getTime() / 1000.0);
+	// Create the sprite.
+	const spriteId = await createSprite(
+		e.x,
+		e.y,
+		colour,
+		timestamp,
+		spriteImage.meta.documentId
+	);
+
+	// Draw the sprite straight away.
+	drawSprite(
+		spriteId,
+		spriteImage.fields.blob.meta.documentId,
+		e.x,
+		e.y,
+		colour,
+		timestamp
+	);
 };
 
 export const main = async () => {
-	const HTTP_PORT = await invoke("http_port_command");
-	window.HTTP_PORT = HTTP_PORT;
-
-	/// Address of local node.
-	window.NODE_ADDRESS = `http://localhost:${HTTP_PORT}/`;
-
-	/// Path to the blobs HTTP endpoint.
-	window.BLOBS_PATH = `${NODE_ADDRESS}blobs/`;
-
-	/// GraphQL endpoint.
-	window.GRAPHQL_ENDPOINT = NODE_ADDRESS + "graphql";
-
 	// Get or generate a new key pair.
 	const keyPair = getKeyPair();
-
 	console.log("You are: ", keyPair.publicKey());
 
 	// Open a long running connection to a p2panda node and configure it so all
 	// calls in this session are executed using that key pair
 	window.session = new Session(GRAPHQL_ENDPOINT).setKeyPair(keyPair);
 
-	// Set an interval timer to draw any new sprites every 2 seconds.
+	// Get a sprite image we will use when creating sprites.
+	const spriteImage = await getLatestSpriteImage();
+
+	// Set the cursor style to be a cute sprite image.
+	const body = document.querySelector("body");
+	// Published blobs are served from a HTTP endpoint so we can request it from the local node by
+	// it's document id.
+	body.style.cursor = `url("${BLOBS_PATH}${spriteImage.fields.blob.meta.documentId}"), pointer`;
+
+	// Set onclick handler on body which creates and draws a new sprite.
+	body.onclick = onClickCreateSprite;
+
+	// Set an interval timer to draw any new sprites every 1 seconds.
 	setInterval(async () => {
 		await drawSprites();
 	}, 1000);
-
-	// Get a sprite image we will use when creating sprites.
-	const [blobId, spriteImageId] = await getSpriteImage();
-
-	const body = document.querySelector("body");
-
-	// Set the cursor style to be a cute sprite image.
-	body.style.cursor = `url("${BLOBS_PATH}${blobId}"), pointer`;
-
-	// Set onclick handler on body which creates and draws a new sprite.
-	body.onclick = async (e) => {
-		// Derive a unique deterministic colour from our public key.
-		const colour = intoColour(keyPair.publicKey());
-		// Get a unix timestamp for now.
-		const timestamp = Math.floor(new Date().getTime() / 1000.0);
-		// Create the sprite.
-		const spriteId = await createSprite(
-			e.x,
-			e.y,
-			colour,
-			timestamp,
-			spriteImageId
-		);
-		// Draw the sprite straight away.
-		drawSprite(spriteId, blobId, e.x, e.y, colour, timestamp);
-	};
 };
