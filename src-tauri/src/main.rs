@@ -20,10 +20,12 @@ use crate::config::load_config;
 use crate::key_pair::generate_or_load_key_pair;
 use crate::schema::load_schema_lock;
 
+struct HttpPort(u16);
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn http_port_command(state: State<HttpPort>) -> u16 {
+    state.0
 }
 
 /// Get path to the current app data directory.
@@ -129,7 +131,7 @@ fn main() {
 
     builder
         .setup(setup_handler)
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![http_port_command])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
