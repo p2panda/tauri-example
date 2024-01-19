@@ -1,5 +1,5 @@
+import { invoke } from "@tauri-apps/api/tauri";
 import { KeyPair, Session } from "shirokuma";
-import pandaUrl from "./panda.gif";
 import {
 	createSprite,
 	createSpriteImage,
@@ -7,17 +7,10 @@ import {
 	getSpriteImages,
 } from "./queries";
 
+import pandaUrl from "./panda.gif";
+
 /// Local storage key for our private key.
 const LOCAL_STORAGE_KEY = "privateKey";
-
-/// Address of local node.
-const NODE_ADDRESS = `http://localhost:2020/`;
-
-/// Path to the blobs HTTP endpoint.
-const BLOBS_PATH = `${NODE_ADDRESS}blobs/`;
-
-/// GraphQL endpoint.
-export const GRAPHQL_ENDPOINT = NODE_ADDRESS + "graphql";
 
 /// Generate a new KeyPair or retrieve existing one from local storage.
 const getKeyPair = () => {
@@ -99,8 +92,22 @@ const drawSprite = (spriteId, blobId, posX, posY, description) => {
 };
 
 export const main = async () => {
+	const HTTP_PORT = await invoke("http_port_command");
+	window.HTTP_PORT = HTTP_PORT;
+
+	/// Address of local node.
+	window.NODE_ADDRESS = `http://localhost:${HTTP_PORT}/`;
+
+	/// Path to the blobs HTTP endpoint.
+	window.BLOBS_PATH = `${NODE_ADDRESS}blobs/`;
+
+	/// GraphQL endpoint.
+	window.GRAPHQL_ENDPOINT = NODE_ADDRESS + "graphql";
+
 	// Get or generate a new key pair.
 	const keyPair = getKeyPair();
+
+	console.log("You are: ", keyPair.publicKey())
 
 	// Open a long running connection to a p2panda node and configure it so all
 	// calls in this session are executed using that key pair
@@ -109,7 +116,7 @@ export const main = async () => {
 	// Set an interval timer to draw any new sprites every 2 seconds.
 	setInterval(async () => {
 		await drawSprites();
-	}, 2000);
+	}, 1000);
 
 	// Get a sprite image we will use when creating sprites.
 	const [blobId, spriteImageId] = await getSpriteImage();
@@ -117,7 +124,7 @@ export const main = async () => {
 	const body = document.querySelector("body");
 
 	// Set the cursor style to be a cute sprite image.
-	body.style.cursor = `url("${BLOBS_PATH}${blobId}"), pointer`
+	body.style.cursor = `url("${BLOBS_PATH}${blobId}"), pointer`;
 
 	// Set onclick handler on body which creates and draws a new sprite.
 	body.onclick = async (e) => {

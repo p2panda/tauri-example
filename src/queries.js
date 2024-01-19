@@ -1,5 +1,4 @@
 import { OperationFields } from "shirokuma";
-import { GRAPHQL_ENDPOINT } from "./main.js";
 
 const SPRITES_SCHEMA_ID =
 	"sprites_0020d542c271bf3b5fb8d419584219c8120946cd783a8e48398f831f958ba5ede995";
@@ -8,7 +7,7 @@ const SPRITE_IMAGES_SCHEMA_ID =
 	"sprite_images_002032604325c478c09ef9c60af330928f9e38a801d5941c3e0b87c5e13fe3ca629e";
 
 const request = async (query) => {
-	return fetch(GRAPHQL_ENDPOINT, {
+	return fetch(window.GRAPHQL_ENDPOINT, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({
