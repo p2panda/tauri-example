@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "peer": "HTTP_PORT=$(shuf -i 1024-65535 -n 1) tauri dev --no-watch --config '{\"build\": {\"beforeDevCommand\": \"\"}}'"
+    "peer": "HTTP_PORT=${HTTP_PORT:-$(shuf -i 1024-65535 -n 1)} tauri dev --no-watch --config '{\"build\": {\"beforeDevCommand\": \"\"}}'"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.4.0",
