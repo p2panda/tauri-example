@@ -5,7 +5,7 @@
 </div>
 
 This is an example on how to integrate an [`aquadoggo`](https://github.com/p2panda/aquadoggo/)
-node right next to a React frontend using the desktop application framework
+node right next to a web frontend using the desktop application framework
 [Tauri](https://tauri.app/). By embedding a node like that, your application will gain full
 peer-to-peer and local-first capabilities.
 
