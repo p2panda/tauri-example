@@ -68,20 +68,20 @@ export const getSpriteImages = async (first, after) => {
     orderBy: `timestamp`,
     orderDirection: `DESC`,
     fields: `{
-	  cursor
-	  fields {
-		description
-		timestamp
-		blob {
-		  meta {
-	        documentId
-		  }
-		}
-	  }
-	  meta {
-		documentId
-		viewId
-	  }
+      cursor
+      fields {
+        description
+        timestamp
+        blob {
+          meta {
+          documentId
+          }
+        }
+      }
+      meta {
+        documentId
+        viewId
+      }
     }`,
   };
   return await paginatedQuery(options);
@@ -101,28 +101,28 @@ export const getSprites = async (first, notInSpriteIds, after) => {
     meta: `{ documentId: { notIn: [${notInSpriteIds}] } }`,
     fields: `{
       cursor
-		fields {
-		  colour
-	      pos_x
-		  pos_y
-		  timestamp
-		  img {
-			fields {
-			  description
-			  timestamp
-				blob {
-				  meta {
-				    documentId
-				  }
-				}
-			  }
-			}
-		}
-		meta {
-		  documentId
-		  viewId
-		}
-	}`,
+      fields {
+        colour
+        pos_x
+        pos_y
+        timestamp
+        img {
+          fields {
+            description
+            timestamp
+            blob {
+              meta {
+                documentId
+              }
+            }
+          }
+        }
+      }
+      meta {
+        documentId
+        viewId
+      }
+    }`,
   };
   return await paginatedQuery(options);
 };
