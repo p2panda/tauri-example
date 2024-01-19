@@ -28,25 +28,26 @@ fn greet(name: &str) -> String {
 
 /// Get path to the current app data directory.
 ///
-/// If in dev mode app data is persisted to a temporary folder "./tmp" in the project
-/// directory. When not in dev mode app data path is based on tauri defaults and app
-/// name defined in our tauri.conf.json file.
-fn app_data_dir(app: &AppHandle) -> Result<Option<PathBuf>, anyhow::Error> {
-    if cfg!(dev) {
-        Ok(None)
+/// If in dev mode app data is persisted to an ephemeral tmp folder. Otherwise app data path is
+/// based on tauri defaults and app name defined in our tauri.conf.json file.
+fn app_data_dir(app: &AppHandle) -> Result<PathBuf, anyhow::Error> {
+    let path = if cfg!(dev) {
+        PathBuf::from(app.state::<TempDir>().path())
     } else {
         let path = app
             .path_resolver()
             .app_data_dir()
             .expect("error resolving app data dir");
 
-        // Create blobs directory incase it doesn't exist.
-        DirBuilder::new()
-            .recursive(true)
-            .create(path.join(BLOBS_DIR))?;
+        path
+    };
 
-        Ok(Some(path))
-    }
+    // Create blobs directory incase it doesn't exist.
+    DirBuilder::new()
+        .recursive(true)
+        .create(path.join(BLOBS_DIR))?;
+
+    Ok(path)
 }
 
 /// Launch node with configuration of persistent storage for SQLite database and blobs.
@@ -64,6 +65,9 @@ fn setup_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error +
 
     // Load the config from app data directory. If this is the first time the app is
     // being run then the default aquadoggo config file is copied into place and used.
+
+    // Add the configured nodes http port to the app state so we can access it from the frontend.
+    app.manage(HttpPort(config.http_port));
 
     // Manually construct the app WebView window as we want to set a custom data directory.
     tauri::WindowBuilder::new(&app, "main", tauri::WindowUrl::App("index.html".into()))
