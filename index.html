@@ -13,21 +13,7 @@
 <body>
   <script type="module">
     import { initWebAssembly } from 'shirokuma';
-    import { invoke } from "@tauri-apps/api/tauri";
     import { main } from './src/main.js';
-
-    /// Get http port of the embedded aquadoggo node. 
-    const HTTP_PORT = await invoke("http_port_command");
-    window.HTTP_PORT = HTTP_PORT;
-
-    /// Address of local node.
-    window.NODE_ADDRESS = `http://localhost:${HTTP_PORT}/`;
-
-    /// Path to the blobs HTTP endpoint.
-    window.BLOBS_PATH = `${NODE_ADDRESS}blobs/`;
-
-    /// GraphQL endpoint.
-    window.GRAPHQL_ENDPOINT = NODE_ADDRESS + "graphql";
 
     initWebAssembly().then(() => {
       main();

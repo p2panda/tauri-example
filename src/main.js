@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/tauri";
 import { KeyPair, Session } from "shirokuma";
 import {
   createSprite,
@@ -9,6 +10,22 @@ import { intoColour, drawSprite } from "./ui";
 
 /// Local storage key for our private key.
 const LOCAL_STORAGE_KEY = "privateKey";
+
+/// Initiate some global constants.
+const init = async () => {
+  /// Get http port of the embedded aquadoggo node by invoking a tauri command.
+  const HTTP_PORT = await invoke("http_port_command");
+  window.HTTP_PORT = HTTP_PORT;
+
+  /// Address of local node.
+  window.NODE_ADDRESS = `http://localhost:${HTTP_PORT}/`;
+
+  /// Path to the blobs HTTP endpoint.
+  window.BLOBS_PATH = `${NODE_ADDRESS}blobs/`;
+
+  /// GraphQL endpoint.
+  window.GRAPHQL_ENDPOINT = NODE_ADDRESS + "graphql";
+};
 
 /// Generate a new KeyPair or retrieve existing one from local storage.
 const getKeyPair = () => {
@@ -125,6 +142,9 @@ const onClickCreateSprite = async (e) => {
 };
 
 export const main = async () => {
+  // Initiate some global constants.
+  await init();
+
   // Get or generate a new key pair.
   const keyPair = getKeyPair();
   console.log("You are: ", keyPair.publicKey());
