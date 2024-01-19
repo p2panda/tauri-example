@@ -12,6 +12,14 @@ import pandaUrl from "./panda.gif";
 /// Local storage key for our private key.
 const LOCAL_STORAGE_KEY = "privateKey";
 
+/// Generate a colour from a public key string.
+function intoColour(publicKeyString) {
+	let stringUniqueHash = [...publicKeyString].reduce((acc, char) => {
+		return char.charCodeAt(0) + ((acc << 5) - acc);
+	}, 0);
+	return `hsl(${stringUniqueHash % 360}, 95%, 50%)`;
+}
+
 /// Generate a new KeyPair or retrieve existing one from local storage.
 const getKeyPair = () => {
 	const privateKey = window.localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -64,13 +72,15 @@ const drawSprites = async () => {
 
 		// For each returned sprite, append them to the current document's body.
 		for (let sprite of documents) {
-			const { pos_x, pos_y, img } = sprite.fields;
+			const { pos_x, pos_y, img, colour, timestamp } = sprite.fields;
 			const { blob, description } = img.fields;
 			drawSprite(
 				sprite.meta.documentId,
 				blob.meta.documentId,
 				pos_x,
 				pos_y,
+				colour,
+				timestamp,
 				description
 			);
 		}
@@ -78,13 +88,22 @@ const drawSprites = async () => {
 };
 
 /// Convert a sprite into an img element and append it to the document body.
-const drawSprite = (spriteId, blobId, posX, posY, description) => {
+const drawSprite = (
+	spriteId,
+	blobId,
+	posX,
+	posY,
+	hexColour,
+	timestamp,
+	description
+) => {
 	const body = document.querySelector("body");
 	const img = document.createElement("img");
 	img.src = `${BLOBS_PATH}${blobId}`;
-	img.style.position = "fixed";
 	img.style.left = `${posX}px`;
 	img.style.top = `${posY}px`;
+	img.style.zIndex = timestamp;
+	img.style.backgroundColor = hexColour;
 	img.classList.add("sprite");
 	img.alt = description;
 	img.id = spriteId;
@@ -107,7 +126,7 @@ export const main = async () => {
 	// Get or generate a new key pair.
 	const keyPair = getKeyPair();
 
-	console.log("You are: ", keyPair.publicKey())
+	console.log("You are: ", keyPair.publicKey());
 
 	// Open a long running connection to a p2panda node and configure it so all
 	// calls in this session are executed using that key pair
@@ -128,7 +147,19 @@ export const main = async () => {
 
 	// Set onclick handler on body which creates and draws a new sprite.
 	body.onclick = async (e) => {
-		const spriteId = await createSprite(e.x, e.y, spriteImageId);
-		drawSprite(spriteId, blobId, e.x, e.y);
+		// Derive a unique deterministic colour from our public key.
+		const colour = intoColour(keyPair.publicKey());
+		// Get a unix timestamp for now.
+		const timestamp = Math.floor(new Date().getTime() / 1000.0);
+		// Create the sprite.
+		const spriteId = await createSprite(
+			e.x,
+			e.y,
+			colour,
+			timestamp,
+			spriteImageId
+		);
+		// Draw the sprite straight away.
+		drawSprite(spriteId, blobId, e.x, e.y, colour, timestamp);
 	};
 };

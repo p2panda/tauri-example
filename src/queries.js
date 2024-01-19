@@ -37,14 +37,12 @@ export const createSpriteImage = async (blobId, description) => {
 	return spriteImageId;
 };
 
-export const createSprite = async (pos_x, pos_y, imgId) => {
-	const timestamp = Math.floor(new Date().getTime() / 1000.0);
+export const createSprite = async (pos_x, pos_y, hexColour, timestamp, imgId) => {
 	let fields = new OperationFields({
 		pos_x: Math.floor(pos_x),
 		pos_y: Math.floor(pos_y),
 		timestamp,
-		// @TODO: set and use this colour field.
-		colour: "",
+		colour: hexColour,
 	});
 
 	fields.insert("img", "relation", imgId);
@@ -93,13 +91,15 @@ export const getSprites = async (first, notInSpriteIds, after) => {
 		first,
 		after,
 		orderBy: `timestamp`,
-		orderDirection: `DESC`,
+		orderDirection: `ASC`,
 		meta: `{ documentId: { notIn: [${notInSpriteIds}] } }`,
 		fields: `{
 			cursor
 			fields {
+				colour
 				pos_x
 				pos_y
+				timestamp
 				img {
 					fields {
 						description
