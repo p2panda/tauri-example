@@ -34,15 +34,6 @@
     },
     "security": {
       "csp": null
-    },
-    "windows": [
-      {
-        "fullscreen": false,
-        "resizable": true,
-        "title": "p2panda-tauri-example",
-        "width": 800,
-        "height": 600
-      }
-    ]
+    }
   }
 }

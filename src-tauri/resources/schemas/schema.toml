@@ -1,0 +1,17 @@
+[sprite_images]
+description = "An image which can be assigned to a sprite"
+
+[sprite_images.fields]
+blob = { type = "relation", schema = { id = "blob_v1" } }
+description = { type = "str" }
+timestamp = { type = "int" }
+
+[sprites]
+description = "A sprite which can be placed on a 2 dimensional plane"
+
+[sprites.fields]
+img = { type = "relation", schema = { name = "sprite_images" } }
+pos_x = { type = "int" }
+pos_y = { type = "int" }
+timestamp = { type = "int" }
+colour = { type = "str" }

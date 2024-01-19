@@ -9,14 +9,17 @@ use std::path::PathBuf;
 use anyhow::Result;
 use p2panda_rs::identity::KeyPair;
 
+use crate::consts::PRIVATE_KEY_FILE;
+
 /// Returns a new instance of `KeyPair` by either loading the private key from a path or generating
 /// a new one and saving it in the file system.
 pub fn generate_or_load_key_pair(path: PathBuf) -> Result<KeyPair> {
-    let key_pair = if path.is_file() {
-        load_key_pair_from_file(path)?
+    let private_key_path = path.join(PRIVATE_KEY_FILE);
+    let key_pair = if private_key_path.is_file() {
+        load_key_pair_from_file(private_key_path.clone())?
     } else {
         let key_pair = KeyPair::new();
-        save_key_pair_to_file(&key_pair, path)?;
+        save_key_pair_to_file(&key_pair, private_key_path.clone())?;
         key_pair
     };
 
@@ -28,7 +31,7 @@ pub fn generate_or_load_key_pair(path: PathBuf) -> Result<KeyPair> {
 /// This method automatically creates the required directories on that path and fixes the
 /// permissions of the file (0600, read and write permissions only for the owner).
 #[cfg(target_os = "unix")]
-fn save_key_pair_to_file(key_pair: &KeyPair, path: PathBuf) -> Result<()> {
+pub fn save_key_pair_to_file(key_pair: &KeyPair, path: PathBuf) -> Result<()> {
     let private_key_hex = hex::encode(key_pair.private_key().as_bytes());
 
     let mut file = File::create(&path)?;
@@ -44,7 +47,7 @@ fn save_key_pair_to_file(key_pair: &KeyPair, path: PathBuf) -> Result<()> {
 }
 
 #[cfg(not(target_os = "unix"))]
-fn save_key_pair_to_file(key_pair: &KeyPair, path: PathBuf) -> Result<()> {
+pub fn save_key_pair_to_file(key_pair: &KeyPair, path: PathBuf) -> Result<()> {
     let private_key_hex = hex::encode(key_pair.private_key().as_bytes());
 
     let mut file = File::create(path)?;
