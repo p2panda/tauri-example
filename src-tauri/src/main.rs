@@ -64,7 +64,15 @@ fn setup_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error +
 
     // Load the config from app data directory. If this is the first time the app is
     // being run then the default aquadoggo config file is copied into place and used.
-    let config = load_config(&app, app_data_dir.as_ref())?;
+
+    // Manually construct the app WebView window as we want to set a custom data directory.
+    tauri::WindowBuilder::new(&app, "main", tauri::WindowUrl::App("index.html".into()))
+        .data_directory(app_data_dir)
+        .resizable(false)
+        .fullscreen(false)
+        .inner_size(800.0, 600.0)
+        .title("p2panda-tauri-example")
+        .build()?;
 
     // Load the schema.lock file.
     let schema_lock = load_schema_lock(&app)?;
