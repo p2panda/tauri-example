@@ -14,7 +14,7 @@ use std::time::Duration;
 
 use aquadoggo::Node;
 use consts::BLOBS_DIR;
-use tauri::{async_runtime, AppHandle};
+use tempdir::TempDir;
 
 use crate::config::load_config;
 use crate::key_pair::generate_or_load_key_pair;
@@ -118,7 +118,16 @@ fn main() {
         let _ = env_logger::builder().try_init();
     }
 
-    tauri::Builder::default()
+    // Construct a default app builder.
+    let mut builder = tauri::Builder::default();
+
+    // If we're in dev mode then initialize a temp dir we will use for app data. It's attached to
+    // app state and we can access it throughout app setup.
+    if cfg!(dev) {
+        builder = builder.manage(TempDir::new("p2panda-tauri-example").unwrap());
+    }
+
+    builder
         .setup(setup_handler)
         .invoke_handler(tauri::generate_handler![greet])
         .run(tauri::generate_context!())
