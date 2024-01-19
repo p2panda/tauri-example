@@ -6,7 +6,6 @@ import {
   getSpriteImages,
 } from "./queries";
 import { intoColour, drawSprite } from "./ui";
-import pandaUrl from "./panda.gif";
 
 /// Local storage key for our private key.
 const LOCAL_STORAGE_KEY = "privateKey";
@@ -38,7 +37,7 @@ const getLatestSpriteImage = async () => {
     console.log("No sprite images found, uploading 'panda.gif'");
 
     // Fetch a cute panda gif.
-    const data = await fetch(pandaUrl);
+    const data = await fetch("/panda.gif");
     const blob = await data.blob();
 
     // Publish it to the node as a blob_v1 document.
