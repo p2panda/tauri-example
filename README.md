@@ -81,13 +81,16 @@ Schema are deployed to the node automatically on initial startup from a `schema.
 in the tauri `resources/schemas` directory. This file was created with the CLI tool
 [`fishy`](https://github.com/p2panda/fishy).
 
+When you replace these schema with the ones for your own application, don't forget to update `allow_schema_ids`
+in your `config.toml` as well!  
+
 ### Logging
 
 You can enable and configure logging using the `RUST_LOG` environment variable like so:
 
 ```bash
 # Show debug logs emitted by `aquadoggo`
-RUST_LOG="debug" npm run tauri dev
+RUST_LOG="aquadoggo=debug" npm run tauri dev
 
 # Show info logs emitted by all crates used in `aquadoggo`
 RUST_LOG="info" npm run tauri dev
