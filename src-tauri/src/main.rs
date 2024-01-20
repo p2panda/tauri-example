@@ -8,16 +8,12 @@ mod consts;
 mod key_pair;
 mod schema;
 
-use std::fs::DirBuilder;
-use std::path::PathBuf;
 use std::time::Duration;
 
 use aquadoggo::Node;
-use consts::BLOBS_DIR;
-use tauri::{async_runtime, AppHandle, Manager, State};
-use tempdir::TempDir;
+use tauri::{async_runtime, Manager, State};
 
-use crate::config::load_config;
+use crate::config::{app_data_dir, load_config};
 use crate::key_pair::generate_or_load_key_pair;
 use crate::schema::load_schema_lock;
 
@@ -29,55 +25,30 @@ fn http_port_command(state: State<HttpPort>) -> u16 {
     state.0
 }
 
-/// Get path to the current app data directory.
-///
-/// If in dev mode app data is persisted to an ephemeral tmp folder. Otherwise app data path is
-/// based on tauri defaults and app name defined in our tauri.conf.json file.
-fn app_data_dir(app: &AppHandle) -> Result<PathBuf, anyhow::Error> {
-    let path = if cfg!(dev) {
-        PathBuf::from(app.state::<TempDir>().path())
-    } else {
-        app.path_resolver()
-            .app_data_dir()
-            .expect("error resolving app data dir")
-    };
-
-    // Create blobs directory incase it doesn't exist.
-    DirBuilder::new()
-        .recursive(true)
-        .create(path.join(BLOBS_DIR))?;
-
-    Ok(path)
-}
-
 /// Launch node with configuration of persistent storage for SQLite database and blobs.
 fn setup_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error + 'static>> {
     // Get a handle on the running application which gives us access to global state.
     let app = app.handle();
 
-    // Get the app data directory path, in dev mode this will be an ephemeral tmp directory
-    // created for this instance of the app.
-    let app_data_dir = app_data_dir(&app)?;
-
     // Create a KeyPair or load it from private-key.txt file in app data directory.
     //
     // This key pair is used to identify the node on the network, it is not used for signing
     // any application data.
-    let key_pair = generate_or_load_key_pair(app_data_dir.clone())?;
+    let key_pair = generate_or_load_key_pair(&app)?;
 
     // Load the config from app data directory. If this is the first time the app is
     // being run then the default aquadoggo config file is copied into place and used.
     //
     // Environment variables are also parsed and will take priority over values in the config
     // file.
-    let config = load_config(&app, app_data_dir.clone())?;
+    let config = load_config(&app)?;
 
     // Add the configured nodes http port to the app state so we can access it from the frontend.
     app.manage(HttpPort(config.http_port));
 
     // Manually construct the app WebView window as we want to set a custom data directory.
     tauri::WindowBuilder::new(&app, "main", tauri::WindowUrl::App("index.html".into()))
-        .data_directory(app_data_dir)
+        .data_directory(app_data_dir(&app)?)
         .resizable(false)
         .fullscreen(false)
         .inner_size(800.0, 600.0)
@@ -126,16 +97,7 @@ fn main() {
         let _ = env_logger::builder().try_init();
     }
 
-    // Construct a default app builder.
-    let mut builder = tauri::Builder::default();
-
-    // If we're in dev mode then initialize a temp dir we will use for app data. It's attached to
-    // app state and we can access it throughout app setup.
-    if cfg!(dev) {
-        builder = builder.manage(TempDir::new("p2panda-tauri-example").unwrap());
-    }
-
-    builder
+    tauri::Builder::default()
         .setup(setup_handler)
         .invoke_handler(tauri::generate_handler![http_port_command])
         .run(tauri::generate_context!())
