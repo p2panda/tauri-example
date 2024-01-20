@@ -1,20 +1,20 @@
-import { invoke } from "@tauri-apps/api/tauri";
-import { KeyPair, Session } from "shirokuma";
+import { invoke } from '@tauri-apps/api/tauri';
+import { KeyPair, Session } from 'shirokuma';
 import {
   createSprite,
   createSpriteImage,
   getSprites,
   getSpriteImages,
-} from "./queries";
-import { intoColour, drawSprite } from "./ui";
+} from './queries';
+import { intoColour, drawSprite } from './ui';
 
 /// Local storage key for our private key.
-const LOCAL_STORAGE_KEY = "privateKey";
+const LOCAL_STORAGE_KEY = 'privateKey';
 
 /// Initiate some global constants.
 const init = async () => {
   /// Get http port of the embedded aquadoggo node by invoking a tauri command.
-  const HTTP_PORT = await invoke("http_port_command");
+  const HTTP_PORT = await invoke('http_port_command');
   window.HTTP_PORT = HTTP_PORT;
 
   /// Address of local node.
@@ -24,7 +24,7 @@ const init = async () => {
   window.BLOBS_PATH = `${NODE_ADDRESS}blobs/`;
 
   /// GraphQL endpoint.
-  window.GRAPHQL_ENDPOINT = NODE_ADDRESS + "graphql";
+  window.GRAPHQL_ENDPOINT = NODE_ADDRESS + 'graphql';
 };
 
 /// Generate a new KeyPair or retrieve existing one from local storage.
@@ -54,7 +54,7 @@ const getLatestSpriteImage = async () => {
     console.log("No sprite images found, uploading 'panda.gif'");
 
     // Fetch a cute panda gif.
-    const data = await fetch("/panda.gif");
+    const data = await fetch('/panda.gif');
     const blob = await data.blob();
 
     // Publish it to the node as a blob_v1 document.
@@ -64,7 +64,7 @@ const getLatestSpriteImage = async () => {
     // description which can be used in the image element's alt text later.
     await createSpriteImage(
       blobId,
-      "A cute cartoon panda standing on it's back legs lifting it's arms up and down"
+      "A cute cartoon panda standing on it's back legs lifting it's arms up and down",
     );
   }
 
@@ -83,7 +83,7 @@ const getLatestSpriteImage = async () => {
 const drawSprites = async () => {
   // Query any existing sprite elements by class and collect their ids. These are used in the
   // GraphQL query below to exclude them from the collection results.
-  let currentSprites = document.querySelectorAll(".sprite");
+  let currentSprites = document.querySelectorAll('.sprite');
   currentSprites = Array.from(currentSprites).map((sprite) => sprite.id);
 
   // Initial pagination values.
@@ -108,7 +108,7 @@ const drawSprites = async () => {
         pos_y,
         colour,
         timestamp,
-        description
+        description,
       );
     }
   }
@@ -127,7 +127,7 @@ const onClickCreateSprite = async (e) => {
     e.y,
     colour,
     timestamp,
-    spriteImage.meta.documentId
+    spriteImage.meta.documentId,
   );
 
   // Draw the sprite straight away.
@@ -137,7 +137,7 @@ const onClickCreateSprite = async (e) => {
     e.x,
     e.y,
     colour,
-    timestamp
+    timestamp,
   );
 };
 
@@ -147,7 +147,7 @@ export const main = async () => {
 
   // Get or generate a new key pair.
   const keyPair = getKeyPair();
-  console.log("You are: ", keyPair.publicKey());
+  console.log('You are: ', keyPair.publicKey());
 
   // Open a long running connection to a p2panda node and configure it so all
   // calls in this session are executed using that key pair
@@ -157,7 +157,7 @@ export const main = async () => {
   const spriteImage = await getLatestSpriteImage();
 
   // Set the cursor style to be a cute sprite image.
-  const body = document.querySelector("body");
+  const body = document.querySelector('body');
   // Published blobs are served from a HTTP endpoint so we can request it from the local node by
   // it's document id.
   body.style.cursor = `url("${BLOBS_PATH}${spriteImage.fields.blob.meta.documentId}"), pointer`;

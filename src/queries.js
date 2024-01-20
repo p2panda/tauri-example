@@ -1,15 +1,15 @@
-import { OperationFields } from "shirokuma";
+import { OperationFields } from 'shirokuma';
 
 const SPRITES_SCHEMA_ID =
-  "sprites_0020d542c271bf3b5fb8d419584219c8120946cd783a8e48398f831f958ba5ede995";
+  'sprites_0020d542c271bf3b5fb8d419584219c8120946cd783a8e48398f831f958ba5ede995';
 
 const SPRITE_IMAGES_SCHEMA_ID =
-  "sprite_images_002032604325c478c09ef9c60af330928f9e38a801d5941c3e0b87c5e13fe3ca629e";
+  'sprite_images_002032604325c478c09ef9c60af330928f9e38a801d5941c3e0b87c5e13fe3ca629e';
 
 const request = async (query) => {
   return fetch(window.GRAPHQL_ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       query: query,
       variables: {},
@@ -28,7 +28,7 @@ export const createSpriteImage = async (blobId, description) => {
     description,
   });
 
-  fields.insert("blob", "relation", blobId);
+  fields.insert('blob', 'relation', blobId);
 
   const spriteImageId = await window.session.create(fields, {
     schemaId: SPRITE_IMAGES_SCHEMA_ID,
@@ -42,7 +42,7 @@ export const createSprite = async (
   pos_y,
   hexColour,
   timestamp,
-  imgId
+  imgId,
 ) => {
   let fields = new OperationFields({
     pos_x: Math.floor(pos_x),
@@ -51,7 +51,7 @@ export const createSprite = async (
     colour: hexColour,
   });
 
-  fields.insert("img", "relation", imgId);
+  fields.insert('img', 'relation', imgId);
 
   const spriteId = await window.session.create(fields, {
     schemaId: SPRITES_SCHEMA_ID,
@@ -143,12 +143,12 @@ export const paginatedQuery = async (options) => {
   const query = `
     query {
       ${queryName}(
-        ${first ? `first: ${first},` : ""} 
-        ${after ? `after: "${after}",` : ""} 
-        ${orderBy ? `orderBy: ${orderBy},` : ""} 
-        ${orderDirection ? `orderDirection: ${orderDirection},` : ""} 
-        ${filter ? `filter: ${filter},` : ""} 
-        ${meta ? `meta: ${meta},` : ""} 
+        ${first ? `first: ${first},` : ''} 
+        ${after ? `after: "${after}",` : ''} 
+        ${orderBy ? `orderBy: ${orderBy},` : ''} 
+        ${orderDirection ? `orderDirection: ${orderDirection},` : ''} 
+        ${filter ? `filter: ${filter},` : ''} 
+        ${meta ? `meta: ${meta},` : ''} 
       ) {
         totalCount
         hasNextPage
@@ -160,7 +160,7 @@ export const paginatedQuery = async (options) => {
 
   const result = await request(query);
   if (result.errors) {
-    console.error("GraphQL errors: ", result.errors);
+    console.error('GraphQL errors: ', result.errors);
   }
   return result.data[queryName];
 };

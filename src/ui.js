@@ -14,16 +14,16 @@ export const drawSprite = (
   posY,
   hexColour,
   timestamp,
-  description
+  description,
 ) => {
-  const body = document.querySelector("body");
-  const img = document.createElement("img");
+  const body = document.querySelector('body');
+  const img = document.createElement('img');
   img.src = `${BLOBS_PATH}${blobId}`;
   img.style.left = `${posX}px`;
   img.style.top = `${posY}px`;
   img.style.zIndex = timestamp;
   img.style.backgroundColor = hexColour;
-  img.classList.add("sprite");
+  img.classList.add('sprite');
   img.alt = description;
   img.id = spriteId;
   body.appendChild(img);
