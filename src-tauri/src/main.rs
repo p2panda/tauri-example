@@ -37,12 +37,9 @@ fn app_data_dir(app: &AppHandle) -> Result<PathBuf, anyhow::Error> {
     let path = if cfg!(dev) {
         PathBuf::from(app.state::<TempDir>().path())
     } else {
-        let path = app
-            .path_resolver()
+        app.path_resolver()
             .app_data_dir()
-            .expect("error resolving app data dir");
-
-        path
+            .expect("error resolving app data dir")
     };
 
     // Create blobs directory incase it doesn't exist.
