@@ -161,6 +161,7 @@ export const paginatedQuery = async (options) => {
   const result = await request(query);
   if (result.errors) {
     console.error('GraphQL errors: ', result.errors);
+    return;
   }
   return result.data[queryName];
 };
