@@ -18,7 +18,7 @@ static TMP_DIR: OnceLock<TempDir> = OnceLock::new();
 /// Get path to the current app data directory.
 ///
 /// If in dev mode app data is persisted to an ephemeral tmp folder. Otherwise app data path is
-/// based on tauri defaults and app name defined in our tauri.conf.json file.
+/// based on Tauri recommended defaults and app name defined in our Tauri.conf file.
 pub fn app_data_dir(app: &AppHandle) -> Result<PathBuf, anyhow::Error> {
     let path = if cfg!(dev) {
         TMP_DIR
@@ -30,9 +30,17 @@ pub fn app_data_dir(app: &AppHandle) -> Result<PathBuf, anyhow::Error> {
             .path()
             .to_path_buf()
     } else {
-        app.path_resolver()
+        let path = app
+            .path_resolver()
             .app_data_dir()
-            .expect("error resolving app data dir")
+            .expect("recommended app data dir is detected");
+
+        // Create app data directory if it doesn't exist yet.
+        if !path.is_dir() {
+            DirBuilder::new().create(path.clone())?;
+        };
+
+        path
     };
 
     Ok(path)
@@ -40,23 +48,21 @@ pub fn app_data_dir(app: &AppHandle) -> Result<PathBuf, anyhow::Error> {
 
 /// Get configuration from 1. .toml file, 2. environment variables (in that order, meaning that
 /// later configuration sources take precedence over the earlier ones).
-pub fn load_config(app: &AppHandle) -> Result<Configuration> {
-    let app_data_dir = app_data_dir(&app)?;
-
+pub fn load_config(app: &AppHandle, app_data_dir: &PathBuf) -> Result<Configuration> {
+    // Get the default config path.
     let default_config_path = app
         .path_resolver()
         .resolve_resource(PathBuf::new().join(RESOURCES_DIR).join(AQUADOGGO_CONFIG))
         .expect("failed to resolve resource");
 
-    // Determine if a config file path was provided or if we should look for it in common locations
-    let config_file_path = app_data_dir.join(AQUADOGGO_CONFIG);
-
     // Check if the expected config file exists. If not, this is the first time
     // running the app and we want to copy the default into place.
+    let config_file_path = app_data_dir.join(AQUADOGGO_CONFIG);
     if !config_file_path.exists() {
         fs::copy(default_config_path, &config_file_path)?;
     };
 
+    // Load the config file.
     let config_str = fs::read_to_string(config_file_path)?;
     let mut config: ConfigFile = toml::from_str(&config_str)?;
 
@@ -67,12 +73,13 @@ pub fn load_config(app: &AppHandle) -> Result<Configuration> {
     );
 
     // Override blobs path based on app data directory path.
-    config.blobs_base_path = Some(app_data_dir.join(BLOBS_DIR));
+    let blobs_base_path = app_data_dir.join(BLOBS_DIR);
+    config.blobs_base_path = Some(blobs_base_path.clone());
 
-    // Create blobs directory incase it doesn't exist.
-    DirBuilder::new()
-        .recursive(true)
-        .create(app_data_dir.join(BLOBS_DIR))?;
+    // Create blobs directory incase it doesn't exist yet.
+    if !blobs_base_path.is_dir() {
+        DirBuilder::new().create(blobs_base_path)?;
+    };
 
     // Merge the config file with any environment variables.
     let figment = Figment::from(Serialized::defaults(config));

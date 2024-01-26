@@ -8,15 +8,12 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use p2panda_rs::identity::KeyPair;
-use tauri::AppHandle;
 
-use crate::config::app_data_dir;
 use crate::consts::PRIVATE_KEY_FILE;
 
 /// Returns a new instance of `KeyPair` by either loading the private key from a path or generating
 /// a new one and saving it in the file system.
-pub fn generate_or_load_key_pair(app: &AppHandle) -> Result<KeyPair> {
-    let app_data_dir = app_data_dir(&app)?;
+pub fn generate_or_load_key_pair(app_data_dir: &PathBuf) -> Result<KeyPair> {
     let private_key_path = app_data_dir.join(PRIVATE_KEY_FILE);
     let key_pair = if private_key_path.is_file() {
         load_key_pair_from_file(private_key_path.clone())?
