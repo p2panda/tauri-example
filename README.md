@@ -30,7 +30,7 @@ npm run tauri dev
 
 ## Storage
 
-Tauri chooses where app data is stored based on expected platform specific locations.
+Tauri recommends where app data should be stored based on expected platform specific locations.
 
 Linux: Resolves to `$XDG_DATA_HOME` or `$HOME/.local/share`.  
 macOS: Resolves to `$HOME/Library/Application Support`.  
