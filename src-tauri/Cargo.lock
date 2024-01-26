@@ -137,8 +137,9 @@ checksum = "080e9890a082662b09c1ad45f567faeeb47f22b5fb23895fbe1e651e718e25ca"
 
 [[package]]
 name = "aquadoggo"
-version = "0.7.0"
-source = "git+https://github.com/p2panda/aquadoggo?rev=82e85f0e3f1c7d3a6201b49cf3a3f89e6b2fcae3#82e85f0e3f1c7d3a6201b49cf3a3f89e6b2fcae3"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c08d4de4461e2591d0eb8621d4837568fdf602647c12ed6a0ff097f3cc92d69f"
 dependencies = [
  "anyhow",
  "async-graphql",
@@ -3972,7 +3973,7 @@ dependencies = [
 
 [[package]]
 name = "p2panda-tauri-example"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "aquadoggo",
