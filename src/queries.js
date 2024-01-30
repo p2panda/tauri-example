@@ -22,7 +22,8 @@ const request = async (query) => {
 };
 
 export const createSpriteImage = async (blobId, description) => {
-  const timestamp = Math.floor(new Date().getTime() / 1000.0);
+  const timestamp = new Date().getTime();
+
   let fields = new OperationFields({
     timestamp,
     description,

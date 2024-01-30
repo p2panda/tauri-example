@@ -118,10 +118,13 @@ const drawSprites = async () => {
 /// Create, publish and draw a sprite every time the mouse is clicked, yeh!
 const onClickCreateSprite = async (e) => {
   const spriteImage = await getLatestSpriteImage();
+
   // Derive a unique deterministic colour from our public key.
   const colour = intoColour(getKeyPair().publicKey());
+
   // Get a unix timestamp for now.
-  const timestamp = Math.floor(new Date().getTime() / 1000.0);
+  const timestamp = new Date().getTime();
+
   // Create the sprite.
   const spriteId = await createSprite(
     e.x,
