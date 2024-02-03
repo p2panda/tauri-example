@@ -4,6 +4,8 @@
   <img src="https://raw.githubusercontent.com/p2panda/.github/main/assets/tauri-example-screenshot.png" width="600" />
 </div>
 
+[tutorial](https://p2panda.org/tutorials/tauri/) 👈
+
 This is an example on how to integrate an [`aquadoggo`](https://github.com/p2panda/aquadoggo/)
 node right next to a web frontend using the desktop application framework
 [Tauri](https://tauri.app/). By embedding a node like that, your application will gain full
