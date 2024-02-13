@@ -124,4 +124,10 @@ HTTP_PORT=1234 npm run peer
 
 ## License
 
-`UNLICENSED`
+GNU Affero General Public License v3.0 [`AGPL-3.0-or-later`](LICENSE)
+
+## Supported by
+
+<img src="https://raw.githubusercontent.com/p2panda/.github/main/assets/nlnet-logo.svg" width="auto" height="80px"><br />
+
+[`p2panda`]: https://p2panda.org
