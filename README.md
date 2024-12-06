@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/p2panda/.github/main/assets/tauri-example-screenshot.png" width="600" />
 </div>
 
-[tutorial](https://p2panda.org/tutorials/tauri/) 👈
+[tutorial](https://aquadoggo.p2panda.org/tutorials/tauri/) 👈
 
 This is an example on how to integrate an [`aquadoggo`](https://github.com/p2panda/aquadoggo/)
 node right next to a web frontend using the desktop application framework
@@ -130,4 +130,4 @@ GNU Affero General Public License v3.0 [`AGPL-3.0-or-later`](LICENSE)
 
 <img src="https://raw.githubusercontent.com/p2panda/.github/main/assets/nlnet-logo.svg" width="auto" height="80px"><br />
 
-[`p2panda`]: https://p2panda.org
+[`p2panda`]: https://aquadoggo.p2panda.org/
